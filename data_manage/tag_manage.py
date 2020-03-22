@@ -58,6 +58,7 @@ class Tag_manage(Tag__data_initialization):
 		self.location=self.home+r'\data.csv'
 		self.df=pd.read_csv(self.location,index_col='files')
 		self.tags=list(self.df.columns)
+		self.update_files()
 
 	def merge_frames(self, data_frame_list):
 		df = pd.concat(data_frame_list)
@@ -65,11 +66,8 @@ class Tag_manage(Tag__data_initialization):
 
 	def add_tag_column(self, tag_name,default_value=np.nan):
 		z=y.df.copy()
-		print(z)
-		x=pd.DataFrame({'Data':1},index=['Steve'])
-		bon=pd.concat([z,x])
-		print(bon)
-				
+		z[tag_name]=default_value
+		self.update_csv(z)	
 
 	def del_tag_column(self,tag_name):
 		try:
@@ -116,4 +114,3 @@ class Tag_manage(Tag__data_initialization):
 		dataframe.to_csv(self.location,index_label='files')
 		self.df=pd.read_csv(self.location,index_col='files')
 		self.tags=list(dataframe.columns)
-
