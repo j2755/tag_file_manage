@@ -87,7 +87,7 @@ class Tag_manage(Tag__data_initialization):
 		
 		self.update_csv(bon)
 		
-		
+	
 		
 
 	def update_files(self):
@@ -101,6 +101,7 @@ class Tag_manage(Tag__data_initialization):
 		for x in files_to_add:
 			data=[0]*len(self.df.columns)
 			data={self.df.columns[i]:data[i] for i in range(len(self.df.columns))}
+			data.update({self.df.columns[0]:1})
 			self.add_row(x,data)
 	def add_tag_to_file(self, index, column_name, value):
 		copy=self.df.copy()
@@ -114,3 +115,7 @@ class Tag_manage(Tag__data_initialization):
 		dataframe.to_csv(self.location,index_label='files')
 		self.df=pd.read_csv(self.location,index_col='files')
 		self.tags=list(dataframe.columns)
+
+y=Tag_manage(r'D:\Data')
+y.add_tag_column('hello')
+print(y.df)
