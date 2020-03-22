@@ -9,16 +9,12 @@ class Tag__data_initialization:
     	self.directory=directory
     	self.dm = self.create_dataframe_for_entries(directory)
     	self.df = self.dm.df
+    	self.save_dataframe()
 
     	
 
 
 
-    def standardize_tag_names(self, tag_name):
-        try:
-            return tag_name.upper()
-        except:
-            pass
 
     def create_dataframe_for_daughters(self, directory):
         home_tag = directory.split('\\')[-1]
@@ -27,11 +23,14 @@ class Tag__data_initialization:
         dm = data_management.Data_management(directories)
         dm.add_column(home_tag, 1)
         return dm
+    def get_entries(self):
+    	home_tag = self.directory.split('\\')[-1]
+    	exp = file_explore.Navigator(self.directory)
+    	directories = exp.entries
+    	return directories
 
-    def create_dataframe_for_files(self, directory):
-        home_tag = directory.split('\\')[-1]
-        exp = file_explore.Navigator(directory)
-        directories = exp.files
+    def create_dataframe_for_files(self):
+        directories=get_entries()
         dm = data_management.Data_management(directories)
         dm.add_column(home_tag, 1)
 
@@ -52,8 +51,9 @@ class Tag__data_initialization:
 
 
 
-class Tag_manage:
+class Tag_manage(Tag__data_initialization):
 	def __init__(self,directory):
+		super().__init__(directory)
 		self.home=directory
 		self.location=self.home+r'\data.csv'
 		self.df=pd.read_csv(self.location,index_col='files')
@@ -63,13 +63,13 @@ class Tag_manage:
 		df = pd.concat(data_frame_list)
 		return df
 
-
-
 	def add_tag_column(self, tag_name,default_value=np.nan):
-		copy=self.df.copy()
-		copy[tag_name]=default_value
-		self.update_csv(copy)
-		
+		z=y.df.copy()
+		print(z)
+		x=pd.DataFrame({'Data':1},index=['Steve'])
+		bon=pd.concat([z,x])
+		print(bon)
+				
 
 	def del_tag_column(self,tag_name):
 		try:
@@ -80,23 +80,40 @@ class Tag_manage:
 		except:
 			pass
 
-	def add_value(self,data):
-		row=pd.DataFrame([data],index=[index_name])
+	def add_row(self,index_name,tag_data):
+		row=pd.DataFrame(tag_data,index=[index_name])
+		
 		copy=self.df.copy()
-		self.df=pd.concat([row,self.df])
+		
+		bon=pd.concat([copy,row])
+		
+		self.update_csv(bon)
+		
+		
+		
 
-
+	def update_files(self):
+		entries=self.get_entries()
+		files=list(self.df.index)
+		entries.remove('data.csv')
+		
+		files_to_add=[x for x in entries if x not in files]
+		if files_to_add==[]:
+			pass
+		for x in files_to_add:
+			data=[0]*len(self.df.columns)
+			data={self.df.columns[i]:data[i] for i in range(len(self.df.columns))}
+			self.add_row(x,data)
 	def add_tag_to_file(self, index, column_name, value):
 		copy=self.df.copy()
 		copy.at[index, column_name] = value
 		self.update_csv(copy)
 
 	def give_list_of_tags(self):
-		return self.df.columns
+		return list(self.df.columns)
 
 	def update_csv(self,dataframe):
-		dataframe.to_csv(self.location)
+		dataframe.to_csv(self.location,index_label='files')
 		self.df=pd.read_csv(self.location,index_col='files')
 		self.tags=list(dataframe.columns)
-
 
