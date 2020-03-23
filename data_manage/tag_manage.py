@@ -10,12 +10,6 @@ class Tag__data_initialization:
     	self.dm = self.create_dataframe_for_entries(directory)
     	self.df = self.dm.df
     	self.save_dataframe()
-
-    	
-
-
-
-
     def create_dataframe_for_daughters(self, directory):
         home_tag = directory.split('\\')[-1]
         exp = file_explore.Navigator(directory)
@@ -58,14 +52,11 @@ class Tag_manage(Tag__data_initialization):
 		self.location=self.home+r'\data.csv'
 		self.df=pd.read_csv(self.location,index_col='files')
 		self.tags=list(self.df.columns)
+		self.index=list(self.df.index)
 		self.update_files()
 
-	def merge_frames(self, data_frame_list):
-		df = pd.concat(data_frame_list)
-		return df
-
 	def add_tag_column(self, tag_name,default_value=np.nan):
-		z=y.df.copy()
+		z=self.df.copy()
 		z[tag_name]=default_value
 		self.update_csv(z)	
 
@@ -77,7 +68,8 @@ class Tag_manage(Tag__data_initialization):
 			
 		except:
 			pass
-
+	def get_row(self,index):
+		return self.df.loc(index)
 	def add_row(self,index_name,tag_data):
 		row=pd.DataFrame(tag_data,index=[index_name])
 		
@@ -86,8 +78,6 @@ class Tag_manage(Tag__data_initialization):
 		bon=pd.concat([copy,row])
 		
 		self.update_csv(bon)
-		
-	
 		
 
 	def update_files(self):
@@ -103,6 +93,7 @@ class Tag_manage(Tag__data_initialization):
 			data={self.df.columns[i]:data[i] for i in range(len(self.df.columns))}
 			data.update({self.df.columns[0]:1})
 			self.add_row(x,data)
+
 	def add_tag_to_file(self, index, column_name, value):
 		copy=self.df.copy()
 		copy.at[index, column_name] = value
@@ -114,8 +105,24 @@ class Tag_manage(Tag__data_initialization):
 	def update_csv(self,dataframe):
 		dataframe.to_csv(self.location,index_label='files')
 		self.df=pd.read_csv(self.location,index_col='files')
+		self.index=list(dataframe.index)
 		self.tags=list(dataframe.columns)
 
-y=Tag_manage(r'D:\Data')
-y.add_tag_column('hello')
-print(y.df)
+def nest_dataframes_in_daughters(root_directory):
+	root=Tag_manage(root_directory)
+	immediate_directories= next(os.walk(root_directory))[1]
+	for directory in immediate_directories:
+		
+		try:
+			new_df=Tag_manage(root_directory+'\\'+directory)
+		except Exception as e:
+			continue
+
+
+
+		for tag in root.tags:
+			
+			default=root.df.at[directory,tag]
+			new_df.add_tag_column(tag,default)
+
+
