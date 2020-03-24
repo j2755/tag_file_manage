@@ -144,4 +144,7 @@ class Multi_directory_tag_manager:
 		tag_manage=Tag_manage(directory)
 		tag_manage.add_tag_to_file(index,column,value)
 		self.nest_dataframes_in_daughters(directory)
-
+	def add_entry_to_column(self,directory,column,value):
+		tag_manage=Tag_manage(directory)
+		for i in tag_manage.df.index:
+			self.add_entry(directory,i,column,value)
