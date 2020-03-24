@@ -114,8 +114,6 @@ class Multi_directory_tag_manager:
 		self.root=root_directory
 		pass
 
-
-
 	def nest_dataframes_in_daughters(self,root_directory):
 		
 		root=Tag_manage(root_directory)
@@ -142,9 +140,34 @@ class Multi_directory_tag_manager:
 			os.remove(x)
 	def add_entry(self,directory,index,column,value):
 		tag_manage=Tag_manage(directory)
-		tag_manage.add_tag_to_file(index,column,value)
+		normalized_tag=column.lower()
+		tag_manage.add_tag_to_file(index,normalized_tag,value)
 		self.nest_dataframes_in_daughters(directory)
+	def add_multiple_entries(self,directory,index,column_value_dict):
+
+		for tag,value in column_value_dict.items():
+
+			self.add_entry(directory,index,tag,value)
 	def add_entry_to_column(self,directory,column,value):
 		tag_manage=Tag_manage(directory)
 		for i in tag_manage.df.index:
 			self.add_entry(directory,i,column,value)
+
+
+	def concat_all_dataframes(self):
+		files=[]
+		dataframes=[]
+		for r,x,z in os.walk(self.root):
+			for fil in z:
+				if 'data.csv'==fil:
+					files.append(os.path.join(r,fil))
+		
+		for x in files:
+			try:
+				df=pd.read_csv(x,index_col='files')
+				dataframes.append(df)
+			except Exception:
+				continue
+		super_dataframe=pd.concat(dataframes)
+		return super_dataframe
+

@@ -11,9 +11,6 @@ def make_edge_list(node_list_1,node_list_2):
 	return edge_list
 
 
+def get_neighbors(edge_list,node):
+	return [x for x in edge_list if node in x]
 
-
-x=[1,2,3,4,5]
-y=[4,4,4,4,4]
-z=['a','a','a','b','a']
-print(make_edge_list(x,y))
