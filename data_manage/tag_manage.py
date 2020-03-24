@@ -108,21 +108,40 @@ class Tag_manage(Tag__data_initialization):
 		self.index=list(dataframe.index)
 		self.tags=list(dataframe.columns)
 
-def nest_dataframes_in_daughters(root_directory):
-	root=Tag_manage(root_directory)
-	immediate_directories= next(os.walk(root_directory))[1]
-	for directory in immediate_directories:
+
+class Multi_directory_tag_manager:
+	def __init__(self,root_directory):
+		self.root=root_directory
+		pass
+
+
+
+	def nest_dataframes_in_daughters(self,root_directory):
 		
-		try:
-			new_df=Tag_manage(root_directory+'\\'+directory)
-		except Exception as e:
-			continue
-
-
-
-		for tag in root.tags:
+		root=Tag_manage(root_directory)
+		immediate_directories= next(os.walk(root_directory))[1]
+		for directory in immediate_directories:
 			
-			default=root.df.at[directory,tag]
-			new_df.add_tag_column(tag,default)
-
+			try:
+				new_df=Tag_manage(root_directory+'\\'+directory)
+				for tag in root.tags:
+				
+					default=root.df.at[directory,tag]
+					new_df.add_tag_column(tag,default)
+				self.nest_dataframes_in_daughters(root_directory+'\\'+directory)
+			except Exception as e:
+				continue
+			
+	def clear_all_datacsv(self):
+		files=[]
+		for r,x,z in os.walk(self.root):
+			for fil in z:
+				if 'data.csv'==fil:
+					files.append(os.path.join(r,fil))
+		for x in files:
+			os.remove(x)
+	def add_entry(self,directory,index,column,value):
+		tag_manage=Tag_manage(directory)
+		tag_manage.add_tag_to_file(index,column,value)
+		self.nest_dataframes_in_daughters(directory)
 
