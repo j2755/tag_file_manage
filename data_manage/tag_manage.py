@@ -112,6 +112,9 @@ class Tag_manage(Tag__data_initialization):
 class Multi_directory_tag_manager:
 	def __init__(self,root_directory):
 		self.root=root_directory
+		self.manage=Tag_manage(root_directory)
+		self.files=self.manage.index
+		self.tags=self.manage.tags
 		pass
 
 	def nest_dataframes_in_daughters(self,root_directory):
@@ -143,15 +146,24 @@ class Multi_directory_tag_manager:
 		normalized_tag=column.lower()
 		tag_manage.add_tag_to_file(index,normalized_tag,value)
 		self.nest_dataframes_in_daughters(directory)
-	def add_multiple_entries(self,directory,index,column_value_dict):
-
+	def add_multiple_entries_to_index(self,directory,index,column_value_dict):
+		tag_manage=Tag_manage(directory)
+		normalized_tag=column.lower()
 		for tag,value in column_value_dict.items():
-
-			self.add_entry(directory,index,tag,value)
+			tag_manage.add_tag_to_file(index,tag,value)
+		self.nest_dataframes_in_daughters(directory)
+	def add_multiple_entries_to_index_list(self,directory,index_list,column_value_dict):
+		tag_manage=Tag_manage(directory)
+		normalized_tag=column.lower()
+		for i in index:
+			for tag,value in column_value_dict.items():
+				tag_manage.add_tag_to_file(i,tag,value)
+		self.nest_dataframes_in_daughters(directory)
 	def add_entry_to_column(self,directory,column,value):
 		tag_manage=Tag_manage(directory)
 		for i in tag_manage.df.index:
-			self.add_entry(directory,i,column,value)
+			tag_manage.add_tag_column(directory,i,column,value)
+		self.nest_dataframes_in_daughters(directory)
 
 
 	def concat_all_dataframes(self):
@@ -170,4 +182,5 @@ class Multi_directory_tag_manager:
 				continue
 		super_dataframe=pd.concat(dataframes)
 		return super_dataframe
+
 
