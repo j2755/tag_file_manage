@@ -148,8 +148,8 @@ class Multi_directory_tag_manager:
 		self.nest_dataframes_in_daughters(directory)
 	def add_multiple_entries_to_index(self,directory,index,column_value_dict):
 		tag_manage=Tag_manage(directory)
-		normalized_tag=column.lower()
 		for tag,value in column_value_dict.items():
+			normalized_tag=tag.lower()
 			tag_manage.add_tag_to_file(index,tag,value)
 		self.nest_dataframes_in_daughters(directory)
 	def add_multiple_entries_to_index_list(self,directory,index_list,column_value_dict):
@@ -165,7 +165,13 @@ class Multi_directory_tag_manager:
 			tag_manage.add_tag_column(directory,i,column,value)
 		self.nest_dataframes_in_daughters(directory)
 
-
+	def add_multiple_tag_columns(self,directory,column_value_dict):
+		tag_manage=Tag_manage(directory)
+		
+		for tag,value in column_value_dict.items():
+			normalized_tag=tag.lower()
+			tag_manage.add_tag_column(tag,value)
+		self.nest_dataframes_in_daughters(directory)
 	def concat_all_dataframes(self):
 		files=[]
 		dataframes=[]
@@ -182,5 +188,3 @@ class Multi_directory_tag_manager:
 				continue
 		super_dataframe=pd.concat(dataframes)
 		return super_dataframe
-
-
